@@ -1,13 +1,12 @@
 import Prismic from 'prismic-javascript';
 
 import {
-  IAboutMeContent,
-  AboutMeContentMapper
-} from '../helpers/mappers/about-me-content-mapper';
-import {
-  ISkillsContent,
+  AboutMeContentMapper,
+  ProjectsContentMapper,
   SkillsContentMapper
-} from '../helpers/mappers/skills-content-mapper';
+} from '../utils/mappers';
+
+import { IAboutMeContent, ISkillsContent, IProjectsContent } from '../types';
 
 const REPOSITORY = process.env.PRISMIC_REPOSITORY_NAME;
 
@@ -44,13 +43,36 @@ export const fetchSkillsContent = async (): Promise<ISkillsContent[] | []> => {
   try {
     const response = await PrismicClient.query(
       Prismic.Predicates.at('document.type', 'skills'),
-      { orderings: '[document.first_publication_date]' }
+      { orderings: '[my.skills.position]' }
     );
 
     const prismicData = response?.results;
 
     if (prismicData) {
       const mappedData = SkillsContentMapper.map(prismicData);
+      return mappedData;
+    }
+
+    return [];
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+export const fetchProjectsContent = async (): Promise<
+  IProjectsContent[] | []
+> => {
+  try {
+    const response = await PrismicClient.query(
+      Prismic.Predicates.at('document.type', 'projects'),
+      { orderings: '[document.first_publication_date desc]' }
+    );
+
+    const prismicData = response?.results;
+
+    if (prismicData) {
+      const mappedData = ProjectsContentMapper.map(prismicData);
       return mappedData;
     }
 

@@ -1,31 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Document } from 'prismic-javascript/types/documents';
-
-interface IIcon {
-  alt: string;
-  url: string;
-  dimensions: { width: number; height: number };
-}
-
-interface IItem {
-  text: string;
-}
-
-export interface ISkillsContent {
-  icon: IIcon;
-  title: string;
-  items: IItem[];
-}
+import { RichText } from 'prismic-reactjs';
+import { getFormattedImage } from '../../types';
+import { ISkillsContent } from '../../types/Skills';
 
 export class SkillsContentMapper {
   static map = (results: Array<Document>): ISkillsContent[] => {
     const mappedData = results.map(result => {
-      const title = result?.data?.title?.[0]?.text;
+      const title = RichText.asText(result.data.title);
       const items = result?.data?.items;
-      const icon = {
-        ...result?.data?.icon
-      };
-      delete icon.copyright;
+      const icon = getFormattedImage(result.data.icon);
 
       return {
         icon,
